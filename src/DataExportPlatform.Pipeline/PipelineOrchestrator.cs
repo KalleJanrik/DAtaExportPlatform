@@ -4,19 +4,15 @@ using DataExportPlatform.Infrastructure.Data;
 using DataExportPlatform.Infrastructure.Sources;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace DataExportPlatform.Pipeline;
 
-public class PipelineOrchestrator : BackgroundService
+public class PipelineOrchestrator
 {
     private readonly IServiceProvider _services;
     private readonly DataContextCache _cache;
     private readonly ILogger<PipelineOrchestrator> _logger;
-
-    // Manual trigger signal
-    private TaskCompletionSource<bool> _manualTrigger = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     public PipelineOrchestrator(
         IServiceProvider services,
@@ -28,48 +24,19 @@ public class PipelineOrchestrator : BackgroundService
         _logger = logger;
     }
 
-    /// <summary>Triggers a manual pipeline run from a controller or external caller.</summary>
-    public Task TriggerManualRunAsync(CancellationToken ct)
+    /// <summary>Runs the full pipeline and returns when complete.</summary>
+    public async Task RunAsync(CancellationToken ct = default)
     {
-        _manualTrigger.TrySetResult(true);
-        return Task.CompletedTask;
-    }
-
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        _logger.LogInformation("PipelineOrchestrator started.");
-
-        while (!stoppingToken.IsCancellationRequested)
+        _logger.LogInformation("Pipeline run starting.");
+        try
         {
-            var delay = ComputeDelayUntilNextRun();
-            _logger.LogInformation("Next scheduled run in {Delay}.", delay);
-
-            // Wait for either the scheduled time or a manual trigger
-            var delayTask = Task.Delay(delay, stoppingToken);
-            var triggerTask = _manualTrigger.Task;
-
-            var winner = await Task.WhenAny(delayTask, triggerTask);
-
-            if (stoppingToken.IsCancellationRequested)
-                break;
-
-            // Reset trigger for next cycle
-            _manualTrigger = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-            bool isManual = winner == triggerTask;
-            _logger.LogInformation("Pipeline run starting ({Trigger}).", isManual ? "manual" : "scheduled");
-
-            try
-            {
-                await RunPipelineAsync(stoppingToken);
-            }
-            catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
-            {
-                _logger.LogError(ex, "Unhandled exception in pipeline run.");
-            }
+            await RunPipelineAsync(ct);
         }
-
-        _logger.LogInformation("PipelineOrchestrator stopped.");
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unhandled exception in pipeline run.");
+            throw;
+        }
     }
 
     private async Task RunPipelineAsync(CancellationToken ct)
@@ -175,15 +142,4 @@ public class PipelineOrchestrator : BackgroundService
         return (await empTask, await ccTask, await arTask);
     }
 
-    /// <summary>Calculates the delay until the next 02:00 local time.</summary>
-    private static TimeSpan ComputeDelayUntilNextRun()
-    {
-        var now = DateTime.Now;
-        var next = now.Date.AddHours(2); // today at 02:00
-
-        if (next <= now)
-            next = next.AddDays(1); // already past, schedule for tomorrow
-
-        return next - now;
-    }
 }
