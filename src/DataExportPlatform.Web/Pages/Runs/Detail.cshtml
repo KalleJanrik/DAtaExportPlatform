@@ -1,0 +1,75 @@
+@page
+@model DataExportPlatform.Web.Pages.Runs.DetailModel
+@{
+    ViewData["Title"] = $"Run #{Model.Run?.Id} Detail";
+}
+
+@if (Model.Run is null)
+{
+    <div class="alert alert-warning">Pipeline run not found.</div>
+    <a href="/" class="btn btn-secondary">Back</a>
+}
+else
+{
+    <h1 class="mb-1">Pipeline Run #@Model.Run.Id</h1>
+    <p class="text-muted">
+        Started: @Model.Run.StartedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") &nbsp;|&nbsp;
+        Finished: @(Model.Run.FinishedAt.HasValue ? Model.Run.FinishedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") : "In progress") &nbsp;|&nbsp;
+        Status: <span class="badge @BadgeClass(Model.Run.Status)">@Model.Run.Status</span>
+    </p>
+
+    @if (!string.IsNullOrEmpty(Model.Run.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.Run.ErrorMessage</div>
+    }
+
+    <h4 class="mt-4">Export Logs</h4>
+
+    @if (!Model.Run.ExportLogs.Any())
+    {
+        <p class="text-muted">No export logs for this run.</p>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>App</th>
+                    <th>File</th>
+                    <th>Records</th>
+                    <th>Size (bytes)</th>
+                    <th>Status</th>
+                    <th>Exported At</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model.Run.ExportLogs)
+                {
+                    <tr>
+                        <td><strong>@log.AppId</strong></td>
+                        <td><code>@log.FileName</code></td>
+                        <td>@log.RecordCount</td>
+                        <td>@log.FileSizeBytes</td>
+                        <td><span class="badge @(log.Status == DataExportPlatform.Core.Models.ExportStatus.Success ? "bg-success" : "bg-danger")">@log.Status</span></td>
+                        <td>@log.ExportedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td>@(log.ErrorMessage ?? "—")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <a href="/" class="btn btn-secondary mt-3">Back to Dashboard</a>
+}
+
+@functions {
+    static string BadgeClass(DataExportPlatform.Core.Models.PipelineStatus status) => status switch
+    {
+        DataExportPlatform.Core.Models.PipelineStatus.Running        => "bg-primary",
+        DataExportPlatform.Core.Models.PipelineStatus.Success        => "bg-success",
+        DataExportPlatform.Core.Models.PipelineStatus.PartialFailure => "bg-warning text-dark",
+        DataExportPlatform.Core.Models.PipelineStatus.Failed         => "bg-danger",
+        _ => "bg-secondary"
+    };
+}

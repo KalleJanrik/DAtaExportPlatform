@@ -1,0 +1,19 @@
+@page
+@model DataExportPlatform.Web.Pages.Runs.TriggerModel
+@{
+    ViewData["Title"] = "Trigger Pipeline Run";
+}
+
+<h1>Trigger Manual Run</h1>
+
+@if (Model.Triggered)
+{
+    <div class="alert alert-success">Pipeline run triggered successfully. <a href="/">Back to dashboard</a>.</div>
+}
+
+<p>Click the button below to start a pipeline run immediately.</p>
+
+<form method="post">
+    <button type="submit" class="btn btn-success btn-lg">Run Now</button>
+    <a href="/" class="btn btn-secondary btn-lg ms-2">Cancel</a>
+</form>

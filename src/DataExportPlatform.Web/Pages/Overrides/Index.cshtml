@@ -1,0 +1,53 @@
+@page
+@model DataExportPlatform.Web.Pages.Overrides.OverridesIndexModel
+@{
+    ViewData["Title"] = "Costcenter Responsible Overrides";
+}
+
+<h1 class="mb-4">Costcenter Responsible Overrides</h1>
+
+<a href="/Overrides/Edit" class="btn btn-primary mb-3">+ New Override</a>
+
+@if (!Model.Overrides.Any())
+{
+    <div class="alert alert-info">No overrides configured yet.</div>
+}
+else
+{
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Costcenter ID</th>
+                <th>Responsible Email</th>
+                <th>Changed By</th>
+                <th>Changed At</th>
+                <th>Reason</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ov in Model.Overrides)
+            {
+                <tr>
+                    <td>@ov.Id</td>
+                    <td>@ov.CostcenterId</td>
+                    <td>@ov.ResponsibleUserEmail</td>
+                    <td>@ov.ChangedBy</td>
+                    <td>@ov.ChangedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@(ov.Reason ?? "—")</td>
+                    <td>
+                        <a href="/Overrides/Edit?id=@ov.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <form method="post" asp-page-handler="Delete" style="display:inline">
+                            <input type="hidden" name="id" value="@ov.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Delete this override?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a href="/" class="btn btn-secondary mt-3">Back to Dashboard</a>
