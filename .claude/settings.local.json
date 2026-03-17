@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__MCP_DOCKER__mcp-find",
+      "Bash(docker compose:*)",
+      "Bash(netstat -ano)",
+      "Bash(findstr \":1433\")",
+      "Bash(docker exec:*)",
+      "Bash(dotnet run:*)",
+      "Bash(taskkill /PID 26588 /F)",
+      "Bash(cmd /c \"taskkill /PID 26588 /F\")",
+      "Bash(cmd /c \"docker exec dataexportplatform-sqlserver-1 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Dev_Password1! -Q \\\\\"DROP DATABASE IF EXISTS DataExportPlatform\\\\\" -C -N\" 2>&1)",
+      "Bash(cmd /c \"taskkill /F /IM DataExportPlatform.Web.exe\")",
+      "Bash(cmd /c \"taskkill /PID 28676 /F\" 2>&1)",
+      "Bash(dotnet build:*)",
+      "Bash(ASPNETCORE_ENVIRONMENT=Development dotnet DataExportPlatform.Web.dll)",
+      "Bash(cmd /c \"taskkill /F /IM DataExportPlatform.Web.dll\")",
+      "Bash(cmd /c \"for /f \\\\\"tokens=2\\\\\" %i in \\('tasklist /fi \\\\\"imagename eq dotnet.exe\\\\\" /fo list ^| findstr PID'\\) do taskkill /PID %i /F\" 2>&1)",
+      "Bash(cmd /c \"docker exec dataexportplatform-sqlserver-1 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Dev_Password1! -Q \\\\\"DROP DATABASE IF EXISTS DataExportPlatform\\\\\" -C -N && echo dropped\" 2>&1)",
+      "Bash(cmd /c \"taskkill /PID 23148 /F\" 2>&1)",
+      "Bash(cmd /c \"powershell -Command \\\\\"Stop-Process -Id 28676 -Force -ErrorAction SilentlyContinue; Stop-Process -Name 'DataExportPlatform.Web' -Force -ErrorAction SilentlyContinue; Get-Process | Where-Object {$_.Name -like '*DataExport*'} | Stop-Process -Force -ErrorAction SilentlyContinue; Write-Host 'done'\\\\\"\")",
+      "Bash(dotnet clean:*)"
+    ]
+  }
+}
