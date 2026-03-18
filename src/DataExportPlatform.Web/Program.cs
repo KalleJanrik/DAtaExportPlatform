@@ -1,4 +1,5 @@
 using DataExportPlatform.Core.Interfaces;
+using DataExportPlatform.Infrastructure.ActiveDirectory;
 using DataExportPlatform.Infrastructure.Data;
 using DataExportPlatform.Infrastructure.FileWriting;
 using DataExportPlatform.Infrastructure.Sources;
@@ -22,6 +23,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // ── Infrastructure ──────────────────────────────────────────────────────────
 builder.Services.AddSingleton<IFileWriter, ArchivingFileWriter>();
+builder.Services.AddScoped<IAdGroupService, AdGroupService>();
 
 // Register stubs — injected directly into PipelineOrchestrator
 builder.Services.AddSingleton<EmployeeSourceStub>();
