@@ -19,7 +19,20 @@
       "Bash(cmd /c \"docker exec dataexportplatform-sqlserver-1 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Dev_Password1! -Q \\\\\"DROP DATABASE IF EXISTS DataExportPlatform\\\\\" -C -N && echo dropped\" 2>&1)",
       "Bash(cmd /c \"taskkill /PID 23148 /F\" 2>&1)",
       "Bash(cmd /c \"powershell -Command \\\\\"Stop-Process -Id 28676 -Force -ErrorAction SilentlyContinue; Stop-Process -Name 'DataExportPlatform.Web' -Force -ErrorAction SilentlyContinue; Get-Process | Where-Object {$_.Name -like '*DataExport*'} | Stop-Process -Force -ErrorAction SilentlyContinue; Write-Host 'done'\\\\\"\")",
-      "Bash(dotnet clean:*)"
+      "Bash(dotnet clean:*)",
+      "Bash(npm --version)",
+      "Bash(ng version:*)",
+      "Bash(npm view:*)",
+      "Bash(node -e \"const v=JSON.parse\\(require\\(''''fs''''\\).readFileSync\\(''''/dev/stdin'''',''''utf8''''\\)\\); const v21=v.filter\\(x=>x.startsWith\\(''''21''''\\)\\); console.log\\(''''Latest 21.x:'''', v21[v21.length-1]\\); console.log\\(''''Overall latest:'''', v[v.length-1]\\);\")",
+      "Bash(npm install:*)",
+      "Bash(ng new:*)",
+      "Bash(nvm list:*)",
+      "Bash(fnm list:*)",
+      "Bash(winget list:*)",
+      "Bash(winget upgrade:*)",
+      "Bash(xargs grep:*)",
+      "Bash(npm run:*)",
+      "Bash(dotnet test:*)"
     ]
   }
 }
