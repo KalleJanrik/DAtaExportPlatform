@@ -5,6 +5,8 @@ using DataExportPlatform.Infrastructure.Sources;
 using DataExportPlatform.Pipeline;
 using DataExportPlatform.Pipeline.Jobs;
 using DataExportPlatform.Pipeline.Validators;
+using DataExportPlatform.Web.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +46,27 @@ builder.Services.AddTransient<IOverrideValidator<DataExportPlatform.Core.Models.
 builder.Services.AddSingleton<DataContextCache>();
 builder.Services.AddSingleton<ExportArchiveService>();
 builder.Services.AddSingleton<PipelineOrchestrator>();
+
+// ── Authorization ─────────────────────────────────────────────────────────────
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, ArchivePolicyProvider>();
+builder.Services.AddScoped<IAuthorizationHandler, ArchiveJobAuthorizationHandler>();
+builder.Services.AddAuthorization();
+
+// ── Authentication — Windows Auth + AD groups ─────────────────────────────────
+// Uncomment the block below and configure Authorization:ArchiveJobGroups in
+// appsettings.json to enable per-job access control via AD group membership.
+//
+// Also enable Windows Authentication in Properties/launchSettings.json:
+//   "windowsAuthentication": true, "anonymousAuthentication": false
+// And in web.config (when deployed as a Windows Service behind IIS):
+//   <windowsAuthentication enabled="true" />
+//
+// builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+//     .AddNegotiate();
+//
+// builder.Services.AddScoped<IClaimsTransformation, AdGroupClaimsTransformation>();
+//
+// app.UseAuthentication();   // place this before app.UseAuthorization()
 
 // ── Web ───────────────────────────────────────────────────────────────────────
 builder.Services.AddRazorPages();
