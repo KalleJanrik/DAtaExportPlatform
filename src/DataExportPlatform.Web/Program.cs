@@ -42,7 +42,6 @@ builder.Services.AddTransient<IOverrideValidator<DataExportPlatform.Core.Models.
 // ── Pipeline ─────────────────────────────────────────────────────────────────
 builder.Services.AddSingleton<DataContextCache>();
 builder.Services.AddSingleton<PipelineOrchestrator>();
-builder.Services.AddHostedService(sp => sp.GetRequiredService<PipelineOrchestrator>());
 
 // ── Web ───────────────────────────────────────────────────────────────────────
 builder.Services.AddRazorPages();

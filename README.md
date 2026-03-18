@@ -187,19 +187,29 @@ public class AppDExportJob : IExportJob
 builder.Services.AddTransient<IExportJob, AppDExportJob>();
 ```
 
-### 6. Adjust the schedule
+### 6. Schedule the pipeline
 
-The pipeline runs daily at 02:00 local time. Change this in `PipelineOrchestrator.cs`:
+The pipeline has no built-in scheduler. Invoke it from whatever scheduler you control:
 
-```csharp
-private static TimeSpan ComputeDelayUntilNextRun()
-{
-    var now = DateTime.Now;
-    var next = now.Date.AddHours(2); // change this hour
-    if (next <= now) next = next.AddDays(1);
-    return next - now;
-}
 ```
+POST http://your-host/api/pipeline/trigger
+```
+
+The endpoint runs synchronously — it returns `200 OK` when the run completes, or `500` if it fails. This makes it easy to check the outcome from any scheduler.
+
+**Examples:**
+
+Windows Task Scheduler — use a script action:
+```powershell
+Invoke-WebRequest -Uri "http://localhost:49467/api/pipeline/trigger" -Method POST -UseBasicParsing
+```
+
+cron (Linux):
+```
+0 2 * * * curl -s -o /dev/null -w "%{http_code}" -X POST http://your-host/api/pipeline/trigger
+```
+
+Azure Logic Apps / Power Automate — add an HTTP action with method `POST` and the trigger URL.
 
 ### 7. Deploy as a Windows Service
 

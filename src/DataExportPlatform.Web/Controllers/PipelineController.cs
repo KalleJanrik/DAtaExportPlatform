@@ -16,12 +16,23 @@ public class PipelineController : ControllerBase
         _logger = logger;
     }
 
-    /// <summary>Triggers a manual pipeline run. Returns 202 Accepted immediately.</summary>
+    /// <summary>
+    /// Runs the pipeline synchronously and returns 200 OK when complete, or 500 on failure.
+    /// Designed to be called by an external scheduler (Task Scheduler, cron, Azure Logic Apps, etc.).
+    /// </summary>
     [HttpPost("trigger")]
     public async Task<IActionResult> Trigger(CancellationToken ct)
     {
-        _logger.LogInformation("Manual pipeline trigger requested.");
-        await _orchestrator.TriggerManualRunAsync(ct);
-        return Accepted(new { message = "Pipeline run triggered." });
+        _logger.LogInformation("Pipeline trigger requested.");
+        try
+        {
+            await _orchestrator.RunAsync(ct);
+            return Ok(new { message = "Pipeline run completed successfully." });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Pipeline run failed.");
+            return StatusCode(500, new { message = "Pipeline run failed.", error = ex.Message });
+        }
     }
 }

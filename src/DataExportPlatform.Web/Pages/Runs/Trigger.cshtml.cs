@@ -14,7 +14,7 @@ public class TriggerModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(CancellationToken ct)
     {
-        await _orchestrator.TriggerManualRunAsync(ct);
+        await _orchestrator.RunAsync(ct);
         Triggered = true;
         return Page();
     }
