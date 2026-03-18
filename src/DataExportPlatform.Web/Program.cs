@@ -19,7 +19,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         sql => sql.MigrationsAssembly("DataExportPlatform.Infrastructure")));
 
 // ── Infrastructure ──────────────────────────────────────────────────────────
-builder.Services.AddSingleton<IFileWriter, LocalFileWriter>();
+builder.Services.AddSingleton<IFileWriter, ArchivingFileWriter>();
 
 // Register stubs — injected directly into PipelineOrchestrator
 builder.Services.AddSingleton<EmployeeSourceStub>();
@@ -42,6 +42,7 @@ builder.Services.AddTransient<IOverrideValidator<DataExportPlatform.Core.Models.
 
 // ── Pipeline ─────────────────────────────────────────────────────────────────
 builder.Services.AddSingleton<DataContextCache>();
+builder.Services.AddSingleton<ExportArchiveService>();
 builder.Services.AddSingleton<PipelineOrchestrator>();
 
 // ── Web ───────────────────────────────────────────────────────────────────────

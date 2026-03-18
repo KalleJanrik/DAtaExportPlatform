@@ -12,15 +12,18 @@ public class PipelineOrchestrator
 {
     private readonly IServiceProvider _services;
     private readonly DataContextCache _cache;
+    private readonly ExportArchiveService _archive;
     private readonly ILogger<PipelineOrchestrator> _logger;
 
     public PipelineOrchestrator(
         IServiceProvider services,
         DataContextCache cache,
+        ExportArchiveService archive,
         ILogger<PipelineOrchestrator> logger)
     {
         _services = services;
         _cache = cache;
+        _archive = archive;
         _logger = logger;
     }
 
@@ -125,6 +128,10 @@ public class PipelineOrchestrator
         _logger.LogInformation(
             "Pipeline run {Id} finished with status {Status}. {Success} succeeded, {Failed} failed.",
             run.Id, run.Status, successCount, failureCount);
+
+        // ── Step 6: Purge archive day-folders that exceed retention ─────────────
+        _logger.LogInformation("Step 6: Purging expired archive folders.");
+        _archive.PurgeExpiredArchive();
     }
 
     private static async Task<(List<Employee>, List<Costcenter>, List<Accessright>)> FetchAllSourcesAsync(
