@@ -35,6 +35,7 @@ builder.Services.AddSingleton<IDataSource>(sp => sp.GetRequiredService<Accessrig
 builder.Services.AddTransient<IExportJob, AppAExportJob>();
 builder.Services.AddTransient<IExportJob, AppBExportJob>();
 builder.Services.AddTransient<IExportJob, AppCExportJob>();
+builder.Services.AddTransient<IExportJob, AppDExportJob>();
 
 // ── Validators ───────────────────────────────────────────────────────────────
 builder.Services.AddTransient<IOverrideValidator<DataExportPlatform.Core.Models.CostcenterResponsibleOverride>, CostcenterResponsibleValidator>();
