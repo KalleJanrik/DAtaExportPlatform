@@ -31,7 +31,7 @@ public class RunsController : ControllerBase
             r.ErrorMessage,
             r.ExportLogs.Select(l => new ExportLogDto(
                 l.AppId, l.FileName, l.RecordCount, l.FileSizeBytes,
-                l.Status.ToString(), l.ExportedAt, l.ErrorMessage))));
+                l.Status.ToString(), l.ExportedAt, l.ErrorMessage)).ToList()));
 
         return Ok(dtos);
     }
@@ -54,7 +54,7 @@ public class RunsController : ControllerBase
             run.ErrorMessage,
             run.ExportLogs.Select(l => new ExportLogDto(
                 l.AppId, l.FileName, l.RecordCount, l.FileSizeBytes,
-                l.Status.ToString(), l.ExportedAt, l.ErrorMessage)));
+                l.Status.ToString(), l.ExportedAt, l.ErrorMessage)).ToList());
 
         return Ok(dto);
     }
