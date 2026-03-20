@@ -1,15 +1,15 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { throwError } from 'rxjs';
+import { EMPTY, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   const snackBar = inject(MatSnackBar);
 
-  // Polling requests are tagged — swallow all errors silently
+  // Polling requests are tagged — complete silently, no error propagated
   if (req.headers.has('X-Silent-Error')) {
-    return next(req).pipe(catchError(() => throwError(() => null)));
+    return next(req).pipe(catchError(() => EMPTY));
   }
 
   return next(req).pipe(
