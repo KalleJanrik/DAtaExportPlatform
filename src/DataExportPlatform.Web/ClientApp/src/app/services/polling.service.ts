@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, interval, Observable, of } from 'rxjs';
-import { switchMap, takeWhile, catchError } from 'rxjs/operators';
+import { BehaviorSubject, interval, Observable, of, Subscription } from 'rxjs';
+import { switchMap, takeWhile, catchError, tap } from 'rxjs/operators';
 import { PipelineRunDto } from '../models/api.models';
 
 const SILENT_HEADERS = new HttpHeaders({ 'X-Silent-Error': 'true' });
@@ -22,9 +22,10 @@ export class PollingService {
   getRuns$(): Observable<PipelineRunDto[]> {
     return new Observable<PipelineRunDto[]>(subscriber => {
       this.isPolling$.next(false);
+      let innerSub: Subscription | undefined;
 
       // Initial fetch — normal error handling (NOT silent)
-      this.http.get<PipelineRunDto[]>('/api/runs').subscribe({
+      const initialSub = this.http.get<PipelineRunDto[]>('/api/runs').subscribe({
         next: runs => {
           subscriber.next(runs);
           const hasRunning = runs.some(r => r.status === 'Running');
@@ -35,17 +36,15 @@ export class PollingService {
 
           this.isPolling$.next(true);
 
-          interval(5000)
+          innerSub = interval(5000)
             .pipe(
               switchMap(() =>
                 this.http.get<PipelineRunDto[]>('/api/runs', { headers: SILENT_HEADERS }).pipe(
                   catchError(() => of([] as PipelineRunDto[]))
                 )
               ),
-              takeWhile(runs => {
-                subscriber.next(runs);
-                return runs.some(r => r.status === 'Running');
-              }, true)
+              tap(runs => subscriber.next(runs)),
+              takeWhile(runs => runs.some(r => r.status === 'Running'))
             )
             .subscribe({
               complete: () => {
@@ -56,6 +55,12 @@ export class PollingService {
         },
         error: err => subscriber.error(err),
       });
+
+      return () => {
+        initialSub.unsubscribe();
+        innerSub?.unsubscribe();
+        this.isPolling$.next(false);
+      };
     });
   }
 }
