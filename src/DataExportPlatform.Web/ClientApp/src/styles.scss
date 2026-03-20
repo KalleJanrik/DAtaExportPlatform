@@ -1,39 +1,102 @@
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
 html {
-  height: 100%;
-  @include mat.theme(
-    (
-      color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
-      ),
-      typography: Roboto,
-      density: 0,
-    )
-  );
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$red-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+:root {
+  --mat-sys-primary: #00205B;
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-tertiary: #DA1F2B;
+  --mat-sys-on-tertiary: #ffffff;
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
   margin: 0;
-  height: 100%;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: #f5f5f5;
 }
-/* You can add global styles to this file, and also import other style files */
+
+.sidenav-container {
+  height: 100vh;
+}
+
+.sidenav {
+  width: 220px;
+  background: #00205B;
+  color: white;
+}
+
+.sidenav .mat-mdc-list-item {
+  color: white;
+}
+
+.sidenav .nav-item-active {
+  border-left: 3px solid #DA1F2B;
+  background: rgba(255,255,255,0.08);
+}
+
+.mat-toolbar {
+  background: #00205B;
+  color: white;
+}
+
+.content-area {
+  padding: 24px;
+  background: white;
+  min-height: calc(100vh - 64px);
+}
+
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #4caf50;
+  margin-left: 12px;
+}
+
+.live-badge::before {
+  content: '●';
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.status-success { background: #e8f5e9; color: #2e7d32; }
+.status-failed { background: #ffebee; color: #c62828; }
+.status-partialfailure { background: #fff3e0; color: #e65100; }
+.status-running { background: #e3f2fd; color: #1565c0; }
+
+.kpi-card {
+  border-top: 3px solid #00205B;
+  padding: 16px;
+}
+.kpi-card.kpi-error { border-top-color: #DA1F2B; }
+
+.error-message {
+  color: #c62828;
+  padding: 16px;
+}
+
+.access-denied {
+  color: #e65100;
+  padding: 16px;
+}
