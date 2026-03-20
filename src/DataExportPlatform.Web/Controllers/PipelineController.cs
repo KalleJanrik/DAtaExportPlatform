@@ -1,9 +1,11 @@
 using DataExportPlatform.Pipeline;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DataExportPlatform.Web.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/pipeline")]
 public class PipelineController : ControllerBase
 {
@@ -17,22 +19,14 @@ public class PipelineController : ControllerBase
     }
 
     /// <summary>
-    /// Runs the pipeline synchronously and returns 200 OK when complete, or 500 on failure.
+    /// Runs the pipeline synchronously. Returns 200 on success; exceptions bubble to UseExceptionHandler().
     /// Designed to be called by an external scheduler (Task Scheduler, cron, Azure Logic Apps, etc.).
     /// </summary>
     [HttpPost("trigger")]
     public async Task<IActionResult> Trigger(CancellationToken ct)
     {
         _logger.LogInformation("Pipeline trigger requested.");
-        try
-        {
-            await _orchestrator.RunAsync(ct);
-            return Ok(new { message = "Pipeline run completed successfully." });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Pipeline run failed.");
-            return StatusCode(500, new { message = "Pipeline run failed.", error = ex.Message });
-        }
+        await _orchestrator.RunAsync(ct);
+        return Ok(new { message = "Pipeline run completed successfully." });
     }
 }
