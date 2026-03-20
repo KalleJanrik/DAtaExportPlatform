@@ -1,0 +1,45 @@
+@if (accessDenied) {
+  <div class="access-denied">
+    Access denied. You do not have permission to view this archive.
+  </div>
+}
+
+@if (notFound) {
+  <div class="error-message">
+    Archive not found.
+  </div>
+}
+
+@if (job) {
+  <h2 style="color:#00205B; margin-top:0;">{{ job.appId }} Archive</h2>
+
+  @if (job.days.length === 0) {
+    <div style="color:#aaa;">No archived files.</div>
+  }
+
+  <mat-accordion>
+    @for (day of job.days; track day.day) {
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title style="font-weight:600; color:#00205B;">{{ day.day }}</mat-panel-title>
+          <mat-panel-description>{{ day.files.length }} file(s)</mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <mat-list>
+          @for (file of day.files; track file.fileName) {
+            <mat-list-item>
+              <mat-icon matListItemIcon style="color:#00205B;">description</mat-icon>
+              <a matListItemTitle
+                 [href]="downloadUrl(job.appId, day.day, file.fileName)"
+                 download
+                 style="color:#00205B; text-decoration:none;">
+                {{ file.fileName }}
+              </a>
+              <span matListItemLine style="font-size:11px; color:#aaa;">{{ formatBytes(file.sizeBytes) }}</span>
+            </mat-list-item>
+          }
+        </mat-list>
+      </mat-expansion-panel>
+    }
+  </mat-accordion>
+}
