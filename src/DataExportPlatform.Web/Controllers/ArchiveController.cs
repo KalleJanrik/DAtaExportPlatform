@@ -67,7 +67,9 @@ public class ArchiveController : ControllerBase
                 Path.GetFileName(d),
                 Directory.EnumerateFiles(d)
                     .Select(f => new ArchivedFileDto(Path.GetFileName(f), new FileInfo(f).Length))
-                    .OrderBy(f => f.FileName)));
+                    .OrderBy(f => f.FileName)
+                    .ToList()))
+            .ToList();
 
         return Ok(new ArchiveJobDto(appId, days));
     }
@@ -79,7 +81,7 @@ public class ArchiveController : ControllerBase
             return NotFound();
 
         // Path traversal guard
-        if (ContainsPathSeparator(appId) || ContainsPathSeparator(day) || ContainsPathSeparator(file))
+        if (IsUnsafeSegment(day) || IsUnsafeSegment(file))
             return BadRequest();
 
         var auth = await _authorizationService.AuthorizeAsync(User, null, $"Archive.{appId}");
@@ -103,6 +105,6 @@ public class ArchiveController : ControllerBase
     private static bool IsKnownAppId(string appId) =>
         KnownAppIds.Contains(appId, StringComparer.OrdinalIgnoreCase);
 
-    private static bool ContainsPathSeparator(string s) =>
-        s.Contains('/') || s.Contains('\\');
+    private static bool IsUnsafeSegment(string s) =>
+        s.Contains('/') || s.Contains('\\') || s.Contains("..") || s.Contains('%');
 }
