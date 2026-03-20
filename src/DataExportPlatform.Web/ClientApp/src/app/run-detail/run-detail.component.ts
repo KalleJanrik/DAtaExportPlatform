@@ -21,6 +21,7 @@ export class RunDetailComponent implements OnInit {
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (!id) { this.notFound = true; return; }
     this.runsService.getRun(id).subscribe({
       next: run => (this.run = run),
       error: err => {

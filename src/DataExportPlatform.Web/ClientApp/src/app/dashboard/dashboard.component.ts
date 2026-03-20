@@ -17,6 +17,7 @@ import { PollingService } from '../services/polling.service';
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   runs: PipelineRunDto[] = [];
+  loadError = false;
   displayedColumns = ['startedAt', 'duration', 'status', 'jobs', 'actions'];
   private sub?: Subscription;
 
@@ -25,6 +26,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.sub = this.polling.getRuns$().subscribe({
       next: runs => (this.runs = runs),
+      error: () => (this.loadError = true),
     });
   }
 

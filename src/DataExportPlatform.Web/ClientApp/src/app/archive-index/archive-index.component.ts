@@ -14,12 +14,14 @@ import { ArchiveService } from '../services/archive.service';
 })
 export class ArchiveIndexComponent implements OnInit {
   summaries: ArchiveSummaryDto[] = [];
+  loadError = false;
 
   constructor(private archive: ArchiveService, private router: Router) {}
 
   ngOnInit() {
     this.archive.getSummaries().subscribe({
       next: s => (this.summaries = s),
+      error: () => (this.loadError = true),
     });
   }
 

@@ -1,6 +1,8 @@
 <h2 style="color:#00205B; margin-top:0;">Archive</h2>
 
-@if (summaries.length === 0) {
+@if (loadError) {
+  <div class="error-message">Failed to load archive summaries.</div>
+} @else if (summaries.length === 0) {
   <div style="color:#aaa; padding:16px;">
     No archive directories found.
   </div>

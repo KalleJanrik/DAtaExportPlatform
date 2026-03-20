@@ -1,5 +1,9 @@
 <h2 style="color: #00205B; margin-top: 0;">Dashboard</h2>
 
+@if (loadError) {
+  <div class="error-message">Failed to load pipeline runs.</div>
+}
+
 <!-- KPI Cards -->
 <div style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
   <mat-card class="kpi-card" style="flex: 1; min-width: 160px;">

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, interval, Observable, of, Subscription } from 'rxjs';
+import { BehaviorSubject, EMPTY, interval, Observable, Subscription } from 'rxjs';
 import { switchMap, takeWhile, catchError, tap } from 'rxjs/operators';
 import { PipelineRunDto } from '../models/api.models';
 
@@ -40,7 +40,7 @@ export class PollingService {
             .pipe(
               switchMap(() =>
                 this.http.get<PipelineRunDto[]>('/api/runs', { headers: SILENT_HEADERS }).pipe(
-                  catchError(() => of([] as PipelineRunDto[]))
+                  catchError(() => EMPTY)
                 )
               ),
               tap(runs => subscriber.next(runs)),
