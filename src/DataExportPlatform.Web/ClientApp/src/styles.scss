@@ -12,10 +12,20 @@ html {
 }
 
 :root {
+  /* Handelsbanken brand overrides for M3 primary (navy) */
   --mat-sys-primary: #00205B;
   --mat-sys-on-primary: #ffffff;
+  --mat-sys-primary-container: #d0e4ff;
+  --mat-sys-on-primary-container: #00205B;
+  --mat-sys-inverse-primary: #9ecaff;
+  /* Handelsbanken brand overrides for M3 tertiary (red) */
   --mat-sys-tertiary: #DA1F2B;
   --mat-sys-on-tertiary: #ffffff;
+  --mat-sys-tertiary-container: #ffdad9;
+  --mat-sys-on-tertiary-container: #DA1F2B;
+  /* Toolbar token (MDC-based, replaces .mat-toolbar CSS class rule) */
+  --mat-toolbar-container-background-color: #00205B;
+  --mat-toolbar-container-text-color: #ffffff;
 }
 
 body {
@@ -43,10 +53,7 @@ body {
   background: rgba(255,255,255,0.08);
 }
 
-.mat-toolbar {
-  background: #00205B;
-  color: white;
-}
+/* Toolbar color is set via --mat-toolbar-container-background-color in :root above */
 
 .content-area {
   padding: 24px;
