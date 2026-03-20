@@ -1,0 +1,20 @@
+<h2 style="color:#00205B; margin-top:0;">Trigger Run</h2>
+
+<mat-card style="max-width: 480px;">
+  <mat-card-content>
+    <p>Manually trigger a pipeline run. This will run all export jobs synchronously and may take a minute.</p>
+
+    <div style="display:flex; align-items:center; gap:16px; margin-top:16px;">
+      <button mat-raised-button
+              [disabled]="running"
+              style="background:#DA1F2B; color:white;"
+              (click)="trigger()">
+        Run Pipeline
+      </button>
+      @if (running) {
+        <mat-spinner diameter="24"></mat-spinner>
+        <span style="color:#888; font-size:13px;">Running&hellip;</span>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>
