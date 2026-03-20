@@ -15,32 +15,35 @@ public class ArchiveController : ControllerBase
 
     public ArchiveController(IConfiguration configuration, IAuthorizationService authorizationService)
     {
-        _archiveRoot = configuration["ExportSettings:ArchiveRoot"] ?? @"C:\DataExports\Archive";
+        _archiveRoot = Path.GetFullPath(configuration["ExportSettings:ArchiveRoot"] ?? @"C:\DataExports\Archive");
         _authorizationService = authorizationService;
     }
 
     [HttpGet]
-    public IActionResult GetSummaries()
+    public async Task<IActionResult> GetSummaries()
     {
-        var summaries = KnownAppIds
-            .Select(appId =>
-            {
-                var jobDir = Path.Combine(_archiveRoot, appId);
-                if (!Directory.Exists(jobDir))
-                    return null;
+        var summaries = new List<ArchiveSummaryDto>();
 
-                var dayDirs = Directory.EnumerateDirectories(jobDir).ToList();
-                var fileCount = dayDirs.Sum(d => Directory.EnumerateFiles(d).Count());
-                var latestDay = dayDirs
-                    .Select(d => Path.GetFileName(d))
-                    .Where(n => DateTime.TryParse(n, out _))
-                    .OrderDescending()
-                    .FirstOrDefault();
+        foreach (var appId in KnownAppIds)
+        {
+            var auth = await _authorizationService.AuthorizeAsync(User, null, $"Archive.{appId}");
+            if (!auth.Succeeded)
+                continue;
 
-                return new ArchiveSummaryDto(appId, dayDirs.Count, fileCount, latestDay);
-            })
-            .Where(s => s is not null)
-            .ToList();
+            var jobDir = Path.Combine(_archiveRoot, appId);
+            if (!Directory.Exists(jobDir))
+                continue;
+
+            var dayDirs = Directory.EnumerateDirectories(jobDir).ToList();
+            var fileCount = dayDirs.Sum(d => Directory.EnumerateFiles(d).Count());
+            var latestDay = dayDirs
+                .Select(d => Path.GetFileName(d))
+                .Where(n => DateTime.TryParse(n, out _))
+                .OrderDescending()
+                .FirstOrDefault();
+
+            summaries.Add(new ArchiveSummaryDto(appId, dayDirs.Count, fileCount, latestDay));
+        }
 
         return Ok(summaries);
     }
@@ -80,7 +83,7 @@ public class ArchiveController : ControllerBase
         if (!IsKnownAppId(appId))
             return NotFound();
 
-        // Path traversal guard
+        // Path traversal guard — segment-level checks
         if (IsUnsafeSegment(day) || IsUnsafeSegment(file))
             return BadRequest();
 
@@ -89,6 +92,11 @@ public class ArchiveController : ControllerBase
             return Forbid();
 
         var path = Path.Combine(_archiveRoot, appId, day, file);
+
+        // Canonical-path containment check — defence-in-depth after OS normalisation
+        if (!Path.GetFullPath(path).StartsWith(_archiveRoot, StringComparison.OrdinalIgnoreCase))
+            return BadRequest();
+
         if (!System.IO.File.Exists(path))
             return NotFound();
 
