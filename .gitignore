@@ -31,3 +31,8 @@ Thumbs.db
 appsettings.Production.json
 *.pfx
 *.key
+
+src/DataExportPlatform.Web/wwwroot/
+src/DataExportPlatform.Web/ClientApp/node_modules/
+src/DataExportPlatform.Web/ClientApp/dist/
+.superpowers/
