@@ -15,7 +15,8 @@ public class ArchiveController : ControllerBase
 
     public ArchiveController(IConfiguration configuration, IAuthorizationService authorizationService)
     {
-        _archiveRoot = Path.GetFullPath(configuration["ExportSettings:ArchiveRoot"] ?? @"C:\DataExports\Archive");
+        _archiveRoot = Path.GetFullPath(configuration["ExportSettings:ArchiveRoot"] ?? @"C:\DataExports\Archive")
+                       + Path.DirectorySeparatorChar;
         _authorizationService = authorizationService;
     }
 
