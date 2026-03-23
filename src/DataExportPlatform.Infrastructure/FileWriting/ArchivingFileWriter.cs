@@ -8,16 +8,10 @@ namespace DataExportPlatform.Infrastructure.FileWriting;
 ///   2. The archive: {ArchiveRoot}\{AppId}\{yyyy-MM-dd}\{filename}
 /// The AppId is derived from the filename prefix convention (e.g. "appA_" → "AppA").
 /// </summary>
-public class ArchivingFileWriter : IFileWriter
+public class ArchivingFileWriter(IConfiguration configuration) : IFileWriter
 {
-    private readonly LocalFileWriter _inner;
-    private readonly string _archiveRoot;
-
-    public ArchivingFileWriter(IConfiguration configuration)
-    {
-        _inner = new LocalFileWriter();
-        _archiveRoot = configuration["ExportSettings:ArchiveRoot"] ?? @"C:\DataExports\Archive";
-    }
+    private readonly LocalFileWriter _inner = new LocalFileWriter();
+    private readonly string _archiveRoot = configuration["ExportSettings:ArchiveRoot"] ?? @"C:\DataExports\Archive";
 
     public async Task WriteAsync(string directory, string filename, string content, CancellationToken ct = default)
     {

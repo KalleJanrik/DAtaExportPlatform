@@ -25,21 +25,14 @@ namespace DataExportPlatform.Web.Authorization;
 ///   - Member of a job-specific group → ArchiveJob claim → access to that job only
 ///   - A user can be in multiple job groups and will receive one claim per group
 /// </summary>
-public class AdGroupClaimsTransformation : IClaimsTransformation
+public class AdGroupClaimsTransformation(IConfiguration configuration) : IClaimsTransformation
 {
-    private readonly string? _adminGroup;
+    private readonly string? _adminGroup = configuration["Authorization:ArchiveAdminGroup"];
     // Key: AppId (e.g. "AppA"), Value: AD group name (e.g. "DOMAIN\SG-DataExport-AppA")
-    private readonly Dictionary<string, string> _jobGroups;
-
-    public AdGroupClaimsTransformation(IConfiguration configuration)
-    {
-        _adminGroup = configuration["Authorization:ArchiveAdminGroup"];
-
-        _jobGroups = configuration
+    private readonly Dictionary<string, string> _jobGroups = configuration
             .GetSection("Authorization:ArchiveJobGroups")
             .GetChildren()
             .ToDictionary(s => s.Key, s => s.Value ?? string.Empty);
-    }
 
     public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
     {

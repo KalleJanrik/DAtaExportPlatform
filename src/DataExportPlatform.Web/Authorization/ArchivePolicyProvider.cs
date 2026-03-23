@@ -7,15 +7,10 @@ namespace DataExportPlatform.Web.Authorization;
 /// Generates authorization policies on demand for the "Archive.{AppId}" prefix.
 /// All other policy names fall through to the default provider.
 /// </summary>
-public class ArchivePolicyProvider : IAuthorizationPolicyProvider
+public class ArchivePolicyProvider(IOptions<AuthorizationOptions> options) : IAuthorizationPolicyProvider
 {
     private const string PolicyPrefix = "Archive.";
-    private readonly DefaultAuthorizationPolicyProvider _fallback;
-
-    public ArchivePolicyProvider(IOptions<AuthorizationOptions> options)
-    {
-        _fallback = new DefaultAuthorizationPolicyProvider(options);
-    }
+    private readonly DefaultAuthorizationPolicyProvider _fallback = new DefaultAuthorizationPolicyProvider(options);
 
     public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
     {

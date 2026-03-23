@@ -6,19 +6,13 @@ namespace DataExportPlatform.Web.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/archive")]
-public class ArchiveController : ControllerBase
+public class ArchiveController(IConfiguration configuration, IAuthorizationService authorizationService) : ControllerBase
 {
     private static readonly string[] KnownAppIds = ["AppA", "AppB", "AppC", "AppD"];
 
-    private readonly string _archiveRoot;
-    private readonly IAuthorizationService _authorizationService;
-
-    public ArchiveController(IConfiguration configuration, IAuthorizationService authorizationService)
-    {
-        _archiveRoot = Path.GetFullPath(configuration["ExportSettings:ArchiveRoot"] ?? @"C:\DataExports\Archive")
+    private readonly string _archiveRoot = Path.GetFullPath(configuration["ExportSettings:ArchiveRoot"] ?? @"C:\DataExports\Archive")
                        + Path.DirectorySeparatorChar;
-        _authorizationService = authorizationService;
-    }
+    private readonly IAuthorizationService _authorizationService = authorizationService;
 
     [HttpGet]
     public async Task<IActionResult> GetSummaries()

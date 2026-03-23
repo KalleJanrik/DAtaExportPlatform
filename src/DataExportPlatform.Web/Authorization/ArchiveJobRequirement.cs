@@ -7,9 +7,7 @@ namespace DataExportPlatform.Web.Authorization;
 /// Satisfied when the user holds a claim "ArchiveJob" matching the AppId,
 /// or an "ArchiveAll" claim for unrestricted access.
 /// </summary>
-public class ArchiveJobRequirement : IAuthorizationRequirement
+public class ArchiveJobRequirement(string appId) : IAuthorizationRequirement
 {
-    public string AppId { get; }
-
-    public ArchiveJobRequirement(string appId) => AppId = appId;
+    public string AppId { get; } = appId;
 }

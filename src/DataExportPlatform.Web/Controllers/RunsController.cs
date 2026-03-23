@@ -8,11 +8,9 @@ namespace DataExportPlatform.Web.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/runs")]
-public class RunsController : ControllerBase
+public class RunsController(AppDbContext db) : ControllerBase
 {
-    private readonly AppDbContext _db;
-
-    public RunsController(AppDbContext db) => _db = db;
+    private readonly AppDbContext _db = db;
 
     [HttpGet]
     public async Task<IActionResult> GetRuns()

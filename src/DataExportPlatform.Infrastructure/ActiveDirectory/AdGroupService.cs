@@ -7,16 +7,10 @@ using System.Runtime.Versioning;
 namespace DataExportPlatform.Infrastructure.ActiveDirectory;
 
 [SupportedOSPlatform("windows")]
-public class AdGroupService : IAdGroupService
+public class AdGroupService(IConfiguration configuration, ILogger<AdGroupService> logger) : IAdGroupService
 {
-    private readonly string _domain;
-    private readonly ILogger<AdGroupService> _logger;
-
-    public AdGroupService(IConfiguration configuration, ILogger<AdGroupService> logger)
-    {
-        _domain = configuration["ActiveDirectory:Domain"] ?? Environment.UserDomainName;
-        _logger = logger;
-    }
+    private readonly string _domain = configuration["ActiveDirectory:Domain"] ?? Environment.UserDomainName;
+    private readonly ILogger<AdGroupService> _logger = logger;
 
     public Task<IReadOnlyList<AdGroupMember>> GetMembersAsync(string groupName, CancellationToken ct = default)
     {

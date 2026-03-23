@@ -1,20 +1,14 @@
 namespace DataExportPlatform.Core.Models;
 
-public class DataContext
+public class DataContext(
+    IReadOnlyList<Employee> employees,
+    IReadOnlyList<Costcenter> costcenters,
+    IReadOnlyList<Accessright> accessrights)
 {
-    public IReadOnlyList<Employee> Employees { get; }
-    public IReadOnlyList<Costcenter> Costcenters { get; }
-    public IReadOnlyList<Accessright> Accessrights { get; }
+    public IReadOnlyList<Employee> Employees { get; } = employees;
+    public IReadOnlyList<Costcenter> Costcenters { get; } = costcenters;
+    public IReadOnlyList<Accessright> Accessrights { get; } = accessrights;
 
-    public DataContext(
-        IReadOnlyList<Employee> employees,
-        IReadOnlyList<Costcenter> costcenters,
-        IReadOnlyList<Accessright> accessrights)
-    {
-        Employees = employees;
-        Costcenters = costcenters;
-        Accessrights = accessrights;
-    }
 
     /// <summary>
     /// Mutates ResponsibleEmail on matching Costcenters and returns the same instance.
