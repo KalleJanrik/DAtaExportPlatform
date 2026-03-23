@@ -2,19 +2,35 @@
 
 <mat-card style="max-width: 480px;">
   <mat-card-content>
-    <p>Manually trigger a pipeline run. This will run all export jobs synchronously and may take a minute.</p>
+    @if (loadError) {
+      <p style="color:#DA1F2B;">Failed to load available jobs. Please refresh the page.</p>
+    } @else {
+      <p>Select which export jobs to run, then click <strong>Run Pipeline</strong>.</p>
 
-    <div style="display:flex; align-items:center; gap:16px; margin-top:16px;">
-      <button mat-raised-button
-              [disabled]="running"
-              style="background:#DA1F2B; color:white;"
-              (click)="trigger()">
-        Run Pipeline
-      </button>
-      @if (running) {
-        <mat-spinner diameter="24"></mat-spinner>
-        <span style="color:#888; font-size:13px;">Running&hellip;</span>
-      }
-    </div>
+      <div style="margin-bottom:16px;">
+        @for (job of jobs; track job.appId) {
+          <div>
+            <mat-checkbox
+              [checked]="selectedMap[job.appId]"
+              (change)="toggle(job.appId)">
+              {{ job.appId }}
+            </mat-checkbox>
+          </div>
+        }
+      </div>
+
+      <div style="display:flex; align-items:center; gap:16px;">
+        <button mat-raised-button
+                [disabled]="running || selectedIds.length === 0"
+                style="background:#DA1F2B; color:white;"
+                (click)="trigger()">
+          Run Pipeline
+        </button>
+        @if (running) {
+          <mat-spinner diameter="24"></mat-spinner>
+          <span style="color:#888; font-size:13px;">Running&hellip;</span>
+        }
+      </div>
+    }
   </mat-card-content>
 </mat-card>
