@@ -9,21 +9,14 @@ using System.Text;
 
 namespace DataExportPlatform.Pipeline.Jobs;
 
-public class AppDExportJob : IExportJob
+public class AppDExportJob(IFileWriter fileWriter, IConfiguration configuration) : IExportJob
 {
-    private readonly IFileWriter _fileWriter;
-    private readonly string _outputDirectory;
-    private readonly string _sourceFilePath;
+    private readonly IFileWriter _fileWriter = fileWriter;
+    private readonly string _outputDirectory = configuration["ExportSettings:OutputDirectory"] ?? @"C:\DataExports";
+    private readonly string _sourceFilePath = configuration["ExportSettings:AppDSourceFile"]
+            ?? throw new InvalidOperationException("ExportSettings:AppDSourceFile is not configured.");
 
     public string AppId => "AppD";
-
-    public AppDExportJob(IFileWriter fileWriter, IConfiguration configuration)
-    {
-        _fileWriter = fileWriter;
-        _outputDirectory = configuration["ExportSettings:OutputDirectory"] ?? @"C:\DataExports";
-        _sourceFilePath = configuration["ExportSettings:AppDSourceFile"]
-            ?? throw new InvalidOperationException("ExportSettings:AppDSourceFile is not configured.");
-    }
 
     public async Task<IEnumerable<ExportResult>> RunAsync(DataContext ctx, CancellationToken ct)
     {

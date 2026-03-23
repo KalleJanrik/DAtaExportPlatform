@@ -17,5 +17,6 @@
     <ProjectReference Include="..\..\src\DataExportPlatform.Core\DataExportPlatform.Core.csproj" />
     <ProjectReference Include="..\..\src\DataExportPlatform.Pipeline\DataExportPlatform.Pipeline.csproj" />
     <ProjectReference Include="..\..\src\DataExportPlatform.Infrastructure\DataExportPlatform.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\DataExportPlatform.Web\DataExportPlatform.Web.csproj" />
   </ItemGroup>
 </Project>

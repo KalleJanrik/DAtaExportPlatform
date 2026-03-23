@@ -8,32 +8,24 @@ using Microsoft.Extensions.Logging;
 
 namespace DataExportPlatform.Pipeline;
 
-public class PipelineOrchestrator
+public class PipelineOrchestrator(
+    IServiceProvider services,
+    DataContextCache cache,
+    ExportArchiveService archive,
+    ILogger<PipelineOrchestrator> logger)
 {
-    private readonly IServiceProvider _services;
-    private readonly DataContextCache _cache;
-    private readonly ExportArchiveService _archive;
-    private readonly ILogger<PipelineOrchestrator> _logger;
-
-    public PipelineOrchestrator(
-        IServiceProvider services,
-        DataContextCache cache,
-        ExportArchiveService archive,
-        ILogger<PipelineOrchestrator> logger)
-    {
-        _services = services;
-        _cache = cache;
-        _archive = archive;
-        _logger = logger;
-    }
+    private readonly IServiceProvider _services = services;
+    private readonly DataContextCache _cache = cache;
+    private readonly ExportArchiveService _archive = archive;
+    private readonly ILogger<PipelineOrchestrator> _logger = logger;
 
     /// <summary>Runs the full pipeline and returns when complete.</summary>
-    public async Task RunAsync(CancellationToken ct = default)
+    public async Task RunAsync(IReadOnlyCollection<string> jobFilter, CancellationToken ct = default)
     {
         _logger.LogInformation("Pipeline run starting.");
         try
         {
-            await RunPipelineAsync(ct);
+            await RunPipelineAsync(jobFilter, ct);
         }
         catch (Exception ex)
         {
@@ -42,11 +34,18 @@ public class PipelineOrchestrator
         }
     }
 
-    private async Task RunPipelineAsync(CancellationToken ct)
+    private async Task RunPipelineAsync(IReadOnlyCollection<string> jobFilter, CancellationToken ct)
     {
         using var scope = _services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var exportJobs = scope.ServiceProvider.GetRequiredService<IEnumerable<IExportJob>>().ToList();
+        var exportJobs = scope.ServiceProvider
+            .GetRequiredService<IEnumerable<IExportJob>>()
+            .Where(j => jobFilter.Contains(j.AppId))
+            .ToList();
+
+        if (exportJobs.Count == 0)
+            throw new InvalidOperationException(
+                $"Job filter matched no registered jobs. Requested: [{string.Join(", ", jobFilter)}]");
 
         // ── Step 1: Fetch all data sources in parallel ──────────────────────────
         _logger.LogInformation("Step 1: Fetching data sources.");
@@ -82,7 +81,7 @@ public class PipelineOrchestrator
         };
 
         // We need tracking for this insert; temporarily enable it
-        trackedDb.ChangeTracker.QueryTrackingBehavior = Microsoft.EntityFrameworkCore.QueryTrackingBehavior.TrackAll;
+        trackedDb.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
         trackedDb.PipelineRuns.Add(run);
         await trackedDb.SaveChangesAsync(ct);
 
